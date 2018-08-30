@@ -9,6 +9,8 @@ namespace OCA\Unsplash\AppInfo;
 use OC\Security\CSP\ContentSecurityPolicy;
 use OCA\Unsplash\Services\SettingsService;
 use OCP\AppFramework\App;
+use OCP\IRequest;
+use OCP\IURLGenerator;
 use OCP\Util;
 
 /**
@@ -19,12 +21,31 @@ use OCP\Util;
 class Application extends App {
 
     /**
+     * @var IURLGenerator urlGenertor
+     */
+    private $urlGenerator;
+
+    /**
+     * @var string Base of Server URL
+     */
+    private $baseUrl;
+
+    /**
      * Application constructor.
      *
+     * @param $appname
+     * @param IRequest $request
+     * @param IURLGenerator $urlGenerator
      * @param array $urlParams
      */
-    public function __construct(array $urlParams = []) {
+    public function __construct(array $urlParams=array()) {
         parent::__construct('unsplash', $urlParams);
+
+        $container = $this->getContainer();
+        $server = $container->getServer();
+        $this->urlGenerator=$server->getURLGenerator();
+        $this->baseUrl=$this->urlGenerator->linkTo('unsplash', '');
+
     }
 
     /**
@@ -33,6 +54,7 @@ class Application extends App {
      * @throws \OCP\AppFramework\QueryException
      */
     public function register() {
+
         $this->registerPersonalSettings();
         $this->registerStyleSheets();
         $this->registerCsp();
@@ -55,11 +77,26 @@ class Application extends App {
         $settings = $this->getContainer()->query(SettingsService::class);
 
         if($settings->getUserStyleHeaderEnabled()) {
-            Util::addStyle('unsplash', 'header');
+            Util::addHeader(
+                'link',
+                [
+                    'rel'  => "stylesheet",
+                    'type' => "text/css",
+                    'href' => $this->urlGenerator->linkToRouteAbsolute('unsplash.Css.getHeaderCss'),
+                ]
+            );
         }
         if($settings->getServerStyleLoginEnabled()) {
-            Util::addStyle('unsplash', 'login');
+            Util::addHeader(
+            'link',
+                [
+                    'rel'  => "stylesheet",
+                    'type' => "text/css",
+                    'href' => $this->urlGenerator->linkToRouteAbsolute('unsplash.Css.getLoginCss'),
+                ]
+            );
         }
+
     }
 
     /**
