@@ -12,3 +12,12 @@ body#body-login {
 #body-login #alternative-logins li a {
     background-color : rgba(0, 0, 0, .5) !important;
 }
+
+#body-login input.primary:hover,
+#body-login input.primary:focus,
+#body-login button.primary:hover,
+#body-login button.primary:focus,
+#body-login #alternative-logins li a:hover,
+#body-login #alternative-logins li a:focus {
+    background-color : rgba(0, 0, 0, .7) !important;
+}
